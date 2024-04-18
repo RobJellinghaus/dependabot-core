@@ -34,6 +34,7 @@ module Dependabot
           end
           files << lockfile if lockfile
           files << toolchain if toolchain
+          files << cargo_config if cargo_config
           files
         end
 
@@ -274,6 +275,11 @@ module Dependabot
         def toolchain
           @toolchain ||=
             dependency_files.find { |f| f.name == "rust-toolchain" }
+        end
+
+        def cargo_config
+          @cargo_config ||=
+            dependency_files.find { |f| f.name == ".cargo/config.toml" }
         end
 
         def git_dependency?

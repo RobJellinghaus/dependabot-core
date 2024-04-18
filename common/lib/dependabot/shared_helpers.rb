@@ -155,11 +155,16 @@ module Dependabot
       end
 
       env_cmd = [env, cmd].compact
+
+      if ENV["DEBUG_HELPERS"] == "true"
+        debugger
+        puts env_cmd
+      end
+
       stdout, stderr, process = T.unsafe(Open3).capture3(*env_cmd, stdin_data: stdin_data)
       time_taken = Time.now - start
 
       if ENV["DEBUG_HELPERS"] == "true"
-        puts env_cmd
         puts function
         puts stdout
         puts stderr
@@ -342,6 +347,7 @@ module Dependabot
 
       # Save the file
       File.write("git.store", git_store_content)
+
     end
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/PerceivedComplexity
@@ -350,6 +356,17 @@ module Dependabot
     def self.configure_git_to_use_https(host)
       # NOTE: we use --global here (rather than --system) so that Dependabot
       # can be run without privileged access
+      # B4PR: undo this hack and squash it out of the history before pushing anything to github
+      pat = ENV.fetch("SYSTEM_ACCESSTOKEN", nil)
+      # put a colon at the start to indicate "empty string username followed by encoded-pat password"
+      user_pwd_encoded_pat = Base64.strict_encode64(":#{pat}")
+      auth_cmd = 'git config --global --add http.https://dev.azure.com/mscodehub/.extraHeader "AUTHORIZATION: Basic '
+      auth_cmd += user_pwd_encoded_pat + '"'
+      run_shell_command(auth_cmd, allow_unsafe_shell_command: true)
+      auth_cmd = 'git config --global --add http.https://mscodehub.visualstudio.com/.extraHeader "AUTHORIZATION: Basic '
+      auth_cmd += user_pwd_encoded_pat + '"'
+      run_shell_command(auth_cmd, allow_unsafe_shell_command: true)
+
       run_shell_command(
         "git config --global --replace-all url.https://#{host}/." \
         "insteadOf ssh://git@#{host}/"
@@ -369,6 +386,9 @@ module Dependabot
       run_shell_command(
         "git config --global --add url.https://#{host}/." \
         "insteadOf git://#{host}/"
+      )
+      run_shell_command(
+        "git config --global --list"
       )
     end
 
@@ -405,6 +425,7 @@ module Dependabot
                                stderr_to_stdout: true)
       start = Time.now
       cmd = allow_unsafe_shell_command ? command : escape_command(command)
+
       if stderr_to_stdout
         stdout, process = Open3.capture2e(env || {}, cmd)
       else

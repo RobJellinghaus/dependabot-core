@@ -143,10 +143,21 @@ module Dependabot
         end
 
         def run_cargo_command(command, fingerprint: nil)
+          # B4PR
+          puts "Running '#{command}' in directory '#{Dir.pwd}'"
+          stdout2, process2 = Open3.capture2e("ls -aR")
+          puts stdout2
+          stdout2, process2 = Open3.capture2e("/home/dependabot/declare-x.sh")
+          puts stdout2
+
+          debugger
+
           start = Time.now
           command = SharedHelpers.escape_command(command)
           stdout, process = Open3.capture2e(command)
           time_taken = Time.now - start
+
+          puts stdout
 
           # Raise an error with the output from the shell session if Cargo
           # returns a non-zero status
@@ -168,6 +179,11 @@ module Dependabot
 
           File.write(lockfile.name, lockfile.content) if lockfile
           File.write(toolchain.name, toolchain.content) if toolchain
+
+          # B4PR
+          puts "prepared_dependency_files: #{prepared_dependency_files.map { |f| f.name }}"
+          Dir.mkdir(".cargo") if cargo_config
+          File.write(cargo_config.name, cargo_config.content) if cargo_config
         end
 
         def check_rust_workspace_root
@@ -244,6 +260,7 @@ module Dependabot
             raise Dependabot::DependencyFileNotEvaluatable, "Dependabot only supports toolchain 1.68 and up."
           end
 
+          debugger
           raise Dependabot::DependencyFileNotResolvable, error.message if resolvability_error?(error.message)
 
           raise
@@ -417,6 +434,13 @@ module Dependabot
           @original_manifest_files ||=
             original_dependency_files
             .select { |f| f.name.end_with?("Cargo.toml") }
+        end
+
+        def cargo_config
+          puts "VersionResolver::cargo_config: prepared_dependency_files: #{prepared_dependency_files.map { |f| f.name }}
+          "
+          @cargo_config ||= prepared_dependency_files
+                        .find { |f| f.name == ".cargo/config.toml" }
         end
 
         def lockfile

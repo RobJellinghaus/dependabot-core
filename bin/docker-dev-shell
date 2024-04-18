@@ -114,6 +114,7 @@ CODE_DIR="/home/dependabot"
 touch .core-bash_history
 mkdir -p dry-run tmp
 docker run --rm -ti \
+  -v "/mnt/c/Program Files/Git:/mnt/c_git" \
   -v "$(pwd)/.core-bash_history:/home/dependabot/.bash_history" \
   -v "$(pwd)/.rubocop.yml:$CODE_DIR/.rubocop.yml" \
   -v "$(pwd)/.ruby-version:$CODE_DIR/.ruby-version" \

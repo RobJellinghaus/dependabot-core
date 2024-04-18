@@ -159,6 +159,17 @@ unless ENV["LOCAL_AZURE_ACCESS_TOKEN"].to_s.strip.empty?
       "token" => ":#{ENV.fetch('LOCAL_AZURE_ACCESS_TOKEN', nil)}"
     }
   )
+
+  # B4PR: unhack this hack
+  $options[:credentials] << Dependabot::Credential.new(
+    {
+      "type" => "git_source",
+      "host" => "dev.azure.com/mscodehub",
+      "username" => "x-access-token",
+      "token" => ENV.fetch('LOCAL_AZURE_ACCESS_TOKEN', nil)
+    }
+  )
+
 end
 
 unless ENV["LOCAL_CONFIG_VARIABLES"].to_s.strip.empty?
