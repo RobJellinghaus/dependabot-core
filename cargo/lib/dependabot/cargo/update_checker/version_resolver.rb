@@ -137,8 +137,8 @@ module Dependabot
         # so without doing an install (so it's fast).
         def run_cargo_update_command
           run_cargo_command(
-            "cargo update -p #{dependency_spec} --verbose",
-            fingerprint: "cargo update -p <dependency_spec> --verbose"
+            "cargo update -p #{dependency_spec} -vv",
+            fingerprint: "cargo update -p <dependency_spec> -vv"
           )
         end
 
@@ -147,7 +147,7 @@ module Dependabot
           puts "Running '#{command}' in directory '#{Dir.pwd}'"
           stdout2, process2 = Open3.capture2e("ls -aR")
           puts stdout2
-          stdout2, process2 = Open3.capture2e("/home/dependabot/declare-x.sh")
+          stdout2, process2 = Open3.capture2e("/home/dependabot/cargo/script/declare-x.sh")
           puts stdout2
 
           debugger
