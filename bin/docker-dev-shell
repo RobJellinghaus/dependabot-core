@@ -58,10 +58,20 @@ build_image() {
   export DEPENDABOT_USER_GID
   docker_build "$ECOSYSTEM"
 
+  echo "$(tput setaf 2)=> building image from $ECOSYSTEM-updater$(tput sgr0)"
+  pushd $ECOSYSTEM-updater
+  docker build \
+    --build-arg "FROM_IMAGE=$UPDATER_IMAGE_NAME" \
+    -t "$UPDATER_IMAGE_NAME-enhanced" \
+    -f "Dockerfile" \
+    --secret id=SYSTEM_ACCESSTOKEN,env=SYSTEM_ACCESSTOKEN \
+    .
+  popd
+
   echo "$(tput setaf 2)=> building image from $DOCKERFILE$(tput sgr0)"
   docker build \
     --build-arg BUILDKIT_INLINE_CACHE=1 \
-    --build-arg "FROM_IMAGE=$UPDATER_IMAGE_NAME" \
+    --build-arg "FROM_IMAGE=$UPDATER_IMAGE_NAME-enhanced" \
     -t "$IMAGE_NAME" \
     -f "$DOCKERFILE" \
     .

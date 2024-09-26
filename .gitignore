@@ -30,3 +30,6 @@ coverage/
 spoom_data/
 spoom_report.html
 .vs/
+
+# Ignore private wrapper containing PAT
+bin/docker-dev-shell-private-wrapper
