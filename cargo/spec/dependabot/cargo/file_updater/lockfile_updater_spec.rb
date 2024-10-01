@@ -65,7 +65,7 @@ RSpec.describe Dependabot::Cargo::FileUpdater::LockfileUpdater do
       let(:toolchain_file) do
         Dependabot::DependencyFile.new(
           name: "rust-toolchain",
-          content: "[toolchain]\nchannel = \"1.67\"\n"
+          content: "[toolchain]\nchannel = \"ms-1.67\"\n"
         )
       end
       let(:dependency_files) { [manifest, lockfile, toolchain_file] }

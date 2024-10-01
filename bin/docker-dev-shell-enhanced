@@ -39,8 +39,10 @@ while true; do
   esac
 done
 
-IMAGE_NAME="dependabot/dependabot-core-development-$ECOSYSTEM"
-CONTAINER_NAME="dependabot-core-development-$ECOSYSTEM"
+# RJELLING MODIFICATION: add -enhanced to final image/container names
+IMAGE_NAME="dependabot/dependabot-core-development-$ECOSYSTEM-enhanced"
+CONTAINER_NAME="dependabot-core-development-$ECOSYSTEM-enhanced"
+# END RJELLING MODIFICATION
 DOCKERFILE="Dockerfile.development"
 
 if [ "$HELP" = "true" ]; then
@@ -58,13 +60,27 @@ build_image() {
   export DEPENDABOT_USER_GID
   docker_build "$ECOSYSTEM"
 
+  # RJELLING MODIFICATION: add in the cargo-updater layer
+  echo "$(tput setaf 2)=> building image from $ECOSYSTEM-updater$(tput sgr0)"
+  pushd $ECOSYSTEM-updater
+  docker build \
+    --build-arg "FROM_IMAGE=$UPDATER_IMAGE_NAME" \
+    -t "$UPDATER_IMAGE_NAME-enhanced" \
+    -f "Dockerfile" \
+    --secret id=SYSTEM_ACCESSTOKEN,env=SYSTEM_ACCESSTOKEN \
+    .
+  popd
+  # END RJELLING MODIFICATION
+
   echo "$(tput setaf 2)=> building image from $DOCKERFILE$(tput sgr0)"
+  # RJELLING MODIFICATION: append -enhanced to the image name
   docker build \
     --build-arg BUILDKIT_INLINE_CACHE=1 \
-    --build-arg "FROM_IMAGE=$UPDATER_IMAGE_NAME" \
+    --build-arg "FROM_IMAGE=$UPDATER_IMAGE_NAME-enhanced" \
     -t "$IMAGE_NAME" \
     -f "$DOCKERFILE" \
     .
+  # END RJELLING MODIFICATION
 }
 
 IMAGE_ID=$(docker inspect --type=image -f '{{.Id}}' "$IMAGE_NAME" 2> /dev/null || true)

@@ -152,6 +152,13 @@ module Dependabot
           # environment variables, and also any CARGO_REGISTRY_... configuration.
           env = ENV.select { |key, _value| key.match(/^(CARGO_REGISTRY|CARGO_REGISTRIES)_/) }
 
+          puts "Running cargo command: '#{command}'"
+          puts "Environment: #{env}"
+          puts "Working directory: #{Dir.pwd}"
+
+          # kill the process so we can look at the temp dir
+          # exit!
+
           stdout, process = Open3.capture2e(env, command)
           time_taken = Time.now - start
 
@@ -222,6 +229,9 @@ module Dependabot
 
             raise Dependabot::GitDependenciesNotReachable, urls
           end
+
+          # spam the error message
+          puts error.message
 
           [BRANCH_NOT_FOUND_REGEX, REF_NOT_FOUND_REGEX, GIT_REF_NOT_FOUND_REGEX].each do |regex|
             next unless error.message.match?(regex)

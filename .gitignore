@@ -33,3 +33,4 @@ spoom_report.html
 
 # Ignore private wrapper containing PAT
 bin/docker-dev-shell-private-wrapper
+bin/docker-dev-shell-enhanced-private-wrapper
