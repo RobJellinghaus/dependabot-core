@@ -117,17 +117,10 @@ module Dependabot
 
           url = metadata_fetch_url(dependency, index)
 
-          # B4PR
-          puts "Calling #{url} to fetch metadata for #{dependency.name} from #{index}"
-
           response = fetch_response(url, hdrs)
           return {} if response.status == 404
 
           @crates_listing = parse_response(response, index)
-
-          # B4PR
-          puts "Fetched metadata for #{dependency.name} from #{index} successfully"
-          puts response.body
 
           @crates_listing
         end

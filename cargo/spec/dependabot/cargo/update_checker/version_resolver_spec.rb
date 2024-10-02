@@ -170,7 +170,7 @@ RSpec.describe Dependabot::Cargo::UpdateChecker::VersionResolver do
       let(:toolchain_file) do
         Dependabot::DependencyFile.new(
           name: "rust-toolchain",
-          content: "[toolchain]\nchannel = \"1.67\"\n"
+          content: "[toolchain]\nchannel = \"ms-1.67\"\n"
         )
       end
       let(:unprepared_dependency_files) { [manifest, lockfile, toolchain_file] }

@@ -143,8 +143,11 @@ module Dependabot
           command = SharedHelpers.escape_command(command)
           Helpers.setup_credentials_in_environment(credentials)
           # Pass through any registry tokens supplied via CARGO_REGISTRIES_...
-          # environment variables.
-          env = ENV.select { |key, _value| key.match(/^CARGO_REGISTRIES_/) }
+          # environment variables, and also any CARGO_REGISTRY_... configuration.
+          # ...AND any MSRUSTUP_FEED_URL token to support downloading internal toolchain.
+          # TODO RJELLING: question for Brett: how can this work? Is there an ADO pass-through for custom ADO env vars?
+          # TODO RJELLING: question for Brett: how to deal with dependabot-cli keeping all tokens out of dependabot?
+          env = ENV.select { |key, _value| key.match(/^(CARGO_REGISTR(Y|IES)_|MSRUSTUP_(FEED_URL|LOG|PAT))/) }
           stdout, process = Open3.capture2e(env, command)
           time_taken = Time.now - start
 
