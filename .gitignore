@@ -30,7 +30,9 @@ coverage/
 spoom_data/
 spoom_report.html
 .vs/
+# Ignore VSCode C# Dev Kit
+**/.mono/**/values.xml
 
-# Ignore private wrapper containing PAT
+# Ignore private wrappers containing PATs
 bin/docker-dev-shell-private-wrapper
 bin/docker-dev-shell-enhanced-private-wrapper
